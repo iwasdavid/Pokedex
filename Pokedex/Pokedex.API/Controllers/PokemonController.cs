@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Pokedex.API.Interfaces;
 using Pokedex.API.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Pokedex.API.Controllers
 {
@@ -14,19 +12,33 @@ namespace Pokedex.API.Controllers
     {
 
         private readonly ILogger<PokemonController> _logger;
+        private readonly IPokemonService _pokemonService;
 
-        public PokemonController(ILogger<PokemonController> logger)
+        public PokemonController(ILogger<PokemonController> logger, IPokemonService pokemonService)
         {
             _logger = logger;
+            _pokemonService = pokemonService;
         }
 
         [HttpGet]
         [Route("{name}")]
-        public Pokemon Get(string name)
+        public ActionResult<Pokemon> Get(string name)
         {
-            return new Pokemon { 
-                Name = "Pikachu"
-            };
+            try
+            {
+                var pokemon = _pokemonService.GetPokemon(name);
+
+                if (pokemon is not null)
+                {
+                    return Ok(pokemon);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return StatusCode(500);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Pokedex.API.Interfaces;
 using Pokedex.API.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace Pokedex.API.Controllers
 {
@@ -22,15 +23,15 @@ namespace Pokedex.API.Controllers
 
         [HttpGet]
         [Route("{name}")]
-        public ActionResult<Pokemon> Get(string name)
+        public async Task<ActionResult<Pokemon>> Get(string name)
         {
             try
             {
-                var pokemon = _pokemonService.GetPokemon(name);
+                var pokemonServiceResult = await _pokemonService.GetPokemon(name);
 
-                if (pokemon is not null)
+                if (pokemonServiceResult.success)
                 {
-                    return Ok(pokemon);
+                    return Ok(pokemonServiceResult.pokemon);
                 }
                 return NotFound();
             }

@@ -31,13 +31,15 @@ namespace Pokedex.API.Controllers
 
                 if (pokemonServiceResult.success)
                 {
+                    _logger.LogInformation($"Pokemon: {name} found.");
                     return Ok(pokemonServiceResult.pokemon);
                 }
+                _logger.LogWarning($"Pokemon: {name} not found.");
                 return NotFound();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, $"Error thrown when attempting to retrieve Pokemon: {name}. Error Message: {ex.Message}");
                 return StatusCode(500);
             }
         }

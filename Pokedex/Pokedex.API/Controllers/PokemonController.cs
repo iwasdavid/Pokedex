@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Pokedex.API.Interfaces;
+using Pokedex.API.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Pokedex.API.Controllers
@@ -11,29 +11,37 @@ namespace Pokedex.API.Controllers
     [Route("[controller]")]
     public class PokemonController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
 
         private readonly ILogger<PokemonController> _logger;
+        private readonly IPokemonService _pokemonService;
 
-        public PokemonController(ILogger<PokemonController> logger)
+        public PokemonController(ILogger<PokemonController> logger, IPokemonService pokemonService)
         {
             _logger = logger;
+            _pokemonService = pokemonService;
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [Route("{name}")]
+        public async Task<ActionResult<Pokemon>> Get(string name)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            try
             {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+                var pokemonServiceResult = await _pokemonService.GetPokemon(name);
+
+                if (pokemonServiceResult.success)
+                {
+                    _logger.LogInformation($"Pokemon: {name} found.");
+                    return Ok(pokemonServiceResult.pokemon);
+                }
+                _logger.LogWarning($"Pokemon: {name} not found.");
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error thrown when attempting to retrieve Pokemon: {name}. Error Message: {ex.Message}");
+                return StatusCode(500);
+            }
         }
     }
 }

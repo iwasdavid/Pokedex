@@ -1,21 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Pokedex.API.Interfaces;
 using Pokedex.API.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Http;
 
 namespace Pokedex.API
 {
@@ -32,9 +24,15 @@ namespace Pokedex.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IPokemonService, PokemonService>();
+
             services.AddHttpClient<IPokemonClient, PokemonClient>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["BaseUrl"]);
+            });
+
+            services.AddHttpClient<ITranslator, TransaltorService>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["FunTranslationBaseApiUrl"]);
             });
 
             services.AddControllers()

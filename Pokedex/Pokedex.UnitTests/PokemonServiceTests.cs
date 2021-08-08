@@ -13,11 +13,13 @@ namespace Pokedex.UnitTests
     {
         private readonly ILogger<PokemonService> _fakeLogger;
         private readonly IPokemonClient _fakePokemonClient;
+        private readonly ITranslator _fakeTranslatorService;
 
         public PokemonServiceTests()
         {
             _fakeLogger = A.Fake<ILogger<PokemonService>>();
             _fakePokemonClient = A.Fake<IPokemonClient>();
+            _fakeTranslatorService = A.Fake<ITranslator>();
         }
 
         [Fact]
@@ -40,15 +42,15 @@ namespace Pokedex.UnitTests
 
             A.CallTo(() => _fakePokemonClient.GetPokemon(pokemonName)).Returns(new PokemonClientResult(true, pokemonDto));
 
-            var sut = new PokemonService(_fakePokemonClient, _fakeLogger);
+            var sut = new PokemonService(_fakePokemonClient, _fakeTranslatorService, _fakeLogger);
 
-            var result = await sut.GetPokemon(pokemonName);
+            var result = await sut.GetPokemon(pokemonName, false);
 
-            Assert.True(result.success);
-            Assert.Equal(pokemonName, result.pokemon.Name);
-            Assert.Equal(pokemonDescription, result.pokemon.Description);
-            Assert.Equal(pokemonHabitat, result.pokemon.Habitat);
-            Assert.Equal(pokemonIsLegendary, result.pokemon.IsLegendary);
+            Assert.True(result.Success);
+            Assert.Equal(pokemonName, result.Pokemon.Name);
+            Assert.Equal(pokemonDescription, result.Pokemon.Description);
+            Assert.Equal(pokemonHabitat, result.Pokemon.Habitat);
+            Assert.Equal(pokemonIsLegendary, result.Pokemon.IsLegendary);
         }
 
         [Fact]
@@ -58,12 +60,12 @@ namespace Pokedex.UnitTests
 
             A.CallTo(() => _fakePokemonClient.GetPokemon(pokemonName)).Returns(new PokemonClientResult(false, null));
 
-            var sut = new PokemonService(_fakePokemonClient, _fakeLogger);
+            var sut = new PokemonService(_fakePokemonClient, _fakeTranslatorService, _fakeLogger);
 
-            var result = await sut.GetPokemon(pokemonName);
+            var result = await sut.GetPokemon(pokemonName, false);
 
-            Assert.False(result.success);
-            Assert.Null(result.pokemon);
+            Assert.False(result.Success);
+            Assert.Null(result.Pokemon);
         }
 
         [Fact]
@@ -75,15 +77,15 @@ namespace Pokedex.UnitTests
 
             A.CallTo(() => _fakePokemonClient.GetPokemon(pokemonName)).Returns(new PokemonClientResult(true, pokemonDto));
 
-            var sut = new PokemonService(_fakePokemonClient, _fakeLogger);
+            var sut = new PokemonService(_fakePokemonClient, _fakeTranslatorService, _fakeLogger);
 
-            var result = await sut.GetPokemon(pokemonName);
+            var result = await sut.GetPokemon(pokemonName, false);
 
-            Assert.True(result.success);
-            Assert.Equal("No name found", result.pokemon.Name);
-            Assert.Equal("No description found", result.pokemon.Description);
-            Assert.Equal("No habitat found", result.pokemon.Habitat);
-            Assert.False(result.pokemon.IsLegendary);
+            Assert.True(result.Success);
+            Assert.Equal("No name found", result.Pokemon.Name);
+            Assert.Equal("No description found", result.Pokemon.Description);
+            Assert.Equal("No habitat found", result.Pokemon.Habitat);
+            Assert.False(result.Pokemon.IsLegendary);
         }
     }
 }

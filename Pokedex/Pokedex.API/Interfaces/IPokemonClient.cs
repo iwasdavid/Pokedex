@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Pokedex.API.Models;
+﻿using System.Threading.Tasks;
 using Pokedex.API.Services;
 
 namespace Pokedex.API.Interfaces

@@ -29,10 +29,33 @@ namespace Pokedex.API.Controllers
             {
                 var pokemonServiceResult = await _pokemonService.GetPokemon(name);
 
-                if (pokemonServiceResult.success)
+                if (pokemonServiceResult.Success)
                 {
                     _logger.LogInformation($"Pokemon: {name} found.");
-                    return Ok(pokemonServiceResult.pokemon);
+                    return Ok(pokemonServiceResult.Pokemon);
+                }
+                _logger.LogWarning($"Pokemon: {name} not found.");
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error thrown when attempting to retrieve Pokemon: {name}. Error Message: {ex.Message}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
+        [Route("translated/{name}")]
+        public async Task<ActionResult<Pokemon>> Translated(string name)
+        {
+            try
+            {
+                var pokemonServiceResult = await _pokemonService.GetPokemon(name: name, translate: true);
+
+                if (pokemonServiceResult.Success)
+                {
+                    _logger.LogInformation($"Pokemon: {name} found.");
+                    return Ok(pokemonServiceResult.Pokemon);
                 }
                 _logger.LogWarning($"Pokemon: {name} not found.");
                 return NotFound();

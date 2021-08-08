@@ -20,6 +20,10 @@ From `Pokedex/` directory:
 
 `docker run -d -p 8080:80 --name pokemonapi pokedex`
 
+API is now running at `http://localhost:8080`
+
+Can be seen at: `http://localhost:8080/pokemon/mewtwo`
+
 ## TODO
 
 - Give option for app to throw exception if translation service fails
